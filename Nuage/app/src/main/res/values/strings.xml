@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name" translatable="false">Nuage</string>
+    <string name="homeScreenErrorStateMessage">An error occurred :(</string>
+    <string name="testScreenText" translatable="false">This is a test Screen, used to test button responses and other things. This screen should not appear on the top left drawer.</string>
+    <string name="aboutScreenName">About</string>
+    <string name="aboutProgrammerHeading">Programmers</string>
+    <string name="aboutAdvisorHeading">Advisors</string>
+    <string name="aboutTechHeading">APIs and Technologies</string>
+    <string name="aboutTechApi" translatable="false">API by Open Meteo</string>
+    <string name="aboutTechIcons" translatable="false">Icons by Pictogrammers</string>
+    <string name="aboutTechImages" translatable="false">Background from Pexels</string>
+    <string name="nextDaysHeading">Next days</string>
+    <string name="screenHomeName" translatable="false">Nuage</string>
+    <string name="screenAboutName">About</string>
+    <string name="appBarSearchButton">Search</string>
+    <string name="appBarCloseButton">Close</string>
+    <string name="homeScreenLoadingStateMessage">Loading API, please wait :D</string>
+    <string name="homeScreenWelcomeGeocode">Today in %1$s</string>
+    <string name="dailyScreenWelcomeGeocode">%1$s in %2$s</string>
+    <string name="dailyScreenMinTemperatureHero">%1$s ºC</string>
+    <string name="dayScreenProvisionHeading">Hourly Forecast</string>
+</resources>

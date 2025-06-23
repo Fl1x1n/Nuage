@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="homeScreenErrorStateMessage">Um erro ocorreu :(</string>
+    <string name="aboutScreenName">Sobre</string>
+    <string name="aboutProgrammerHeading">Programadores</string>
+    <string name="aboutAdvisorHeading">Tutores</string>
+    <string name="aboutTechHeading">Tecnologias</string>
+    <string name="nextDaysHeading">Próximos dias</string>
+    <string name="screenAboutName">Sobre</string>
+    <string name="appBarSearchButton">Pesquisa</string>
+    <string name="appBarCloseButton">Fechar</string>
+</resources>
