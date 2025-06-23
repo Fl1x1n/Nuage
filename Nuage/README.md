@@ -1,6 +1,3 @@
-Aqui está a tradução para inglês:
-
----
 
 # Nuage
 
