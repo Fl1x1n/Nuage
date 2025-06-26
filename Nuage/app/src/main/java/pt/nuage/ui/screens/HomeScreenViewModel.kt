@@ -1,21 +1,23 @@
 package pt.nuage.ui.screens
 
+import android.content.Context
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import pt.nuage.R
 import pt.nuage.network.DailyData
 import pt.nuage.network.HourlyData
 import pt.nuage.network.NuageApiService
 import pt.nuage.network.SearchData
+import pt.nuage.services.Settings.getLatitudeFlow
+import pt.nuage.services.Settings.getLongitudeFlow
 import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -26,7 +28,6 @@ import kotlin.collections.map
 import kotlin.collections.mutableListOf
 import kotlin.collections.mutableMapOf
 import kotlin.collections.set
-import kotlin.collections.toMutableList
 import kotlin.properties.Delegates
 
 /* ui state to send data to the home screen */
@@ -45,7 +46,7 @@ sealed interface NuageUiState {
     data object Error : NuageUiState
 }
 
-class HomeScreenViewModel : ViewModel() {
+class HomeScreenViewModel(private val context: Context) : ViewModel() {
     /* initialize the nuage ui state */
     var nuageUiState = mutableStateOf<NuageUiState>(NuageUiState.Loading)
         private set
@@ -72,6 +73,11 @@ class HomeScreenViewModel : ViewModel() {
     lateinit var dailyHourlyHumidity: List<Int>
     lateinit var dailyHourlyWeatherCode: List<WeatherCodeEnum>
 
+
+    fun refreshWeatherData() {
+        nuageUiState.value = NuageUiState.Loading
+        getWeatherData()
+    }
     /* enum for the weather code */
     enum class WeatherCodeEnum(
         val description: String,
@@ -92,7 +98,6 @@ class HomeScreenViewModel : ViewModel() {
     }
 
     //Search Section/code
-
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
 
@@ -148,8 +153,10 @@ class HomeScreenViewModel : ViewModel() {
             val currentHour = currentTime.substringAfter('T').substringBefore(':')
             val currentDateHourTemplate = "$currentDate$currentHour:00"
             try {
-                val hourlyWeatherResponse = NuageApiService.retrofitService.getHourlyWeather()
-                val dailyWeatherResponse = NuageApiService.retrofitService.getDailyWeather()
+                val currentLatitude = getLatitudeFlow(context).first() ?: 40.4028 // Default if null
+                val currentLongitude = getLongitudeFlow(context).first() ?: -7.5398 // Default if null
+                val hourlyWeatherResponse = NuageApiService.retrofitService.getHourlyWeather(currentLatitude, currentLongitude)
+                val dailyWeatherResponse = NuageApiService.retrofitService.getDailyWeather(currentLatitude, currentLongitude)
                 hourlyWeather = hourlyWeatherResponse.hourly
                 dailyWeather = dailyWeatherResponse.daily
                 currentTemperature = getHourlyTemperature(currentDateHourTemplate)
@@ -384,6 +391,9 @@ class HomeScreenViewModel : ViewModel() {
         }
         return mappedWeatherCodes
     }
-}
 
+    private fun getGeocode(latitude: Double, longitude: Double) {
+
+    }
+}
 

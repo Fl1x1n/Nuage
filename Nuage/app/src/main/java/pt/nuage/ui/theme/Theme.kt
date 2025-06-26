@@ -93,7 +93,8 @@ val unspecified_scheme = ColorFamily(
 @Composable
 fun NuageTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, /* use true to use dynamic colors. Basically, it fetches the colors
+     from the system. I strongly believe it's from the wallpaper you have. I might be wrong though*/
     content: @Composable() () -> Unit
 ) {
     val colorScheme = when {

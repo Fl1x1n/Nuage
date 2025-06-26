@@ -19,7 +19,8 @@ fun SetUpNavGraph(
     context: Context,
     navController: NavHostController,
     innerPadding: PaddingValues,
-    secondNavGraph: NavHostController
+    secondNavGraph: NavHostController,
+    homeScreenViewModel: HomeScreenViewModel
 ) {
     NavHost(
         navController = navController,
@@ -29,7 +30,8 @@ fun SetUpNavGraph(
             HomeScreenNav(
                 context = context,
                 padding = innerPadding,
-                navController = secondNavGraph
+                navController = secondNavGraph,
+                nuageViewModel = homeScreenViewModel
             )
         }
         composable(Screens.About.route) {
@@ -42,7 +44,7 @@ fun SetUpNavGraph(
 fun HomeScreenNav(
     context: Context,
     navController: NavHostController,
-    nuageViewModel: HomeScreenViewModel = viewModel(),
+    nuageViewModel: HomeScreenViewModel,
     padding: PaddingValues
 ) {
     NavHost(
@@ -53,6 +55,7 @@ fun HomeScreenNav(
         composable(Screens.App.Home.route) {
             HomeScreen(
                 context = context,
+                // The state is already part of the ViewModel, so you can simplify this
                 nuageUiState = nuageViewModel.nuageUiState,
                 modifier = Modifier.padding(padding),
                 navController = navController,

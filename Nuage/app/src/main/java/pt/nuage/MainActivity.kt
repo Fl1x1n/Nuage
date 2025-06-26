@@ -53,7 +53,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import pt.nuage.services.HomeScreenViewModelFactory
+import pt.nuage.services.Settings.saveLocation
 import pt.nuage.ui.navigation.NavBarBody
 import pt.nuage.ui.navigation.NavBarHeader
 import pt.nuage.ui.navigation.NavigationItem
@@ -69,7 +72,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val context: Context = this
-            val nuageViewModel: HomeScreenViewModel = viewModel()
+            val nuageViewModel: HomeScreenViewModel = viewModel(
+                factory = HomeScreenViewModelFactory(this.applicationContext)
+            )
+
             val navControllerApp = rememberNavController()
             NuageTheme {
                 val items = listOf(
@@ -137,8 +143,9 @@ class MainActivity : ComponentActivity() {
                         SetUpNavGraph(
                             navController = navController,
                             innerPadding = innerPadding,
-                            context = context,
-                            secondNavGraph = navControllerApp
+                            context = this,
+                            secondNavGraph = navControllerApp,
+                            homeScreenViewModel = nuageViewModel
                         )
                     }
                 }
@@ -219,9 +226,8 @@ fun SearchAppBar(
     onCloseClicked: () -> Unit,
     viewModel: HomeScreenViewModel,
 ) {
-    var searchFinished by remember {
-        mutableStateOf(true)
-    }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
     val searchText by viewModel.searchText.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
     val searchData by viewModel.searchData.collectAsState()
@@ -251,22 +257,40 @@ fun SearchAppBar(
             expanded = isSearching,
             onExpandedChange = { viewModel.onToogleSearch() }
         ) {
-            if(searchFinished) {
+            if(searchData.isNotEmpty()) {
                 LazyColumn ( modifier = Modifier.fillMaxSize().padding(16.dp), // optional
                     verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(searchData.size) {
                         val item = searchData[it]
-                        Card {
+                        val scope = rememberCoroutineScope()
+                        Card(
+                            onClick = {
+                                scope.launch {
+                                    saveLocation(context, item.latitude, item.longitude)
+                                    viewModel.refreshWeatherData()
+                                }
+                                viewModel.onToogleSearch()
+                                onCloseClicked()
+                            }
+                        ) {
                             Column(Modifier.padding(16.dp).fillMaxWidth()) {
                                 Text(text = item.admin1, style = TextStyle(fontSize = 24.sp))
                                 Text(text =  "${item.name}")
                                 Text(text =  "${item.country}")
+                                Text(text = "${item.latitude} ${item.longitude}")
                             }
                         }
                     }
                 }
-            } else
-                Text(text = "Search something first...")
+            } else if (searchText.isNotBlank() && searchData.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "No results found.")
+                }
+            } else {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "Search for a city or place...")
+                }
+            }
         }
     }
 }
