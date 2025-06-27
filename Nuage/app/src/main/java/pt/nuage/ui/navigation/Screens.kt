@@ -1,11 +1,8 @@
-package pt.nuage.ui.navigation
+    package pt.nuage.ui.navigation
 
-
-sealed class Screens(var route: String) {
-    object App : Screens("home") {
-        object Home : Screens("dashboard")
-        object Daily : Screens("daily")
+    sealed class Screen(val route: String) {
+        object HomeGraph : Screen("home_graph")
+        object Dashboard : Screen("home_graph/dashboard")
+        object DailyDetail : Screen("home_graph/daily")
+        object About : Screen("about")
     }
-
-    object About : Screens("about")
-}

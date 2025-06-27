@@ -32,10 +32,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import pt.nuage.R
 import pt.nuage.network.DailyData
-import pt.nuage.ui.navigation.Screens
 import pt.nuage.ui.screens.components.ImageBackdrop
 import pt.nuage.ui.screens.components.TemperatureHero
 import java.time.LocalDate
@@ -48,7 +46,7 @@ fun HomeScreen(
     nuageUiState: MutableState<NuageUiState>,
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    navController: NavController
+    onDayClicked: (String) -> Unit
 ) {
     when (nuageUiState.value) {
         is NuageUiState.Loading -> LoadingScreen(
@@ -58,8 +56,8 @@ fun HomeScreen(
         is NuageUiState.Success -> HomeScreenApp(
             modifier = modifier,
             context = context,
-            navController = navController,
             viewModel = viewModel,
+            onDayClicked = onDayClicked,
             hourlyTemperature = (nuageUiState.value as NuageUiState.Success).currentTemperature,
             hourlyWeatherCode = (nuageUiState.value as NuageUiState.Success).currentWeatherCode,
             hourlyHumidity = (nuageUiState.value as NuageUiState.Success).currentHumidity,
@@ -105,7 +103,7 @@ fun HomeScreenApp(
     dailyWeatherCode: List<HomeScreenViewModel.WeatherCodeEnum>,
     latitude: Double,
     longitude: Double,
-    navController: NavController,
+    onDayClicked: (String) -> Unit,
     viewModel: HomeScreenViewModel
 ) {
     Column(modifier) {
@@ -118,7 +116,7 @@ fun HomeScreenApp(
             longitude,
             viewModel
         )
-        TemperatureList(dailyWeather, dailyWeatherCode, navController, viewModel)
+        TemperatureList(dailyWeather, dailyWeatherCode, onDayClicked = onDayClicked)
     }
 }
 
@@ -153,8 +151,7 @@ fun TemperatureBanner(
 fun TemperatureList(
     dailyWeather: DailyData.Daily,
     weatherCode: List<HomeScreenViewModel.WeatherCodeEnum>,
-    navController: NavController,
-    viewModel: HomeScreenViewModel
+    onDayClicked: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -184,8 +181,7 @@ fun TemperatureList(
                     weatherCodeIcon = weatherCode[index].icon,
                     weatherCodeDescription = weatherCode[index].description,
                     onDayCardClicked = {
-                        viewModel.executeDailyScreenMapping(dailyWeather.time[index])
-                        navController.navigate(Screens.App.Daily.route)
+                        onDayClicked(dailyWeather.time[index])
                     }
                 )
             }
@@ -267,15 +263,14 @@ fun DayCard(
     }
 }
 
-/* get locality name trough geocoder (currently not working with non-GMS devices */
+/* get locality name trough geocoder (currently not working with non-GMS devices because google is a shit company and i hope they fall off as they are right now) */
 fun getGeocode(context: Context, latitude: Double, longitude: Double): String {
     val local = Locale("pt_PT", "Portugal")
     val maxResult = 1
     var localityName = "N/A"
     val geocoder = Geocoder(context, local)
-   /* val address: MutableList<Address>? = geocoder.getFromLocation(latitude, longitude, maxResult)
-    if (address != null) {
+    val address: MutableList<Address>? = geocoder.getFromLocation(latitude, longitude, maxResult)
+    if (address != null)
         localityName = address[0].locality.toString()
-    } */
     return localityName
 }

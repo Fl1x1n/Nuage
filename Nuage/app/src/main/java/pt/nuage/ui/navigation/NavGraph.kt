@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import pt.nuage.ui.screens.AboutScreen
 import pt.nuage.ui.screens.DayScreen
 import pt.nuage.ui.screens.HomeScreen
@@ -19,54 +20,38 @@ fun SetUpNavGraph(
     context: Context,
     navController: NavHostController,
     innerPadding: PaddingValues,
-    secondNavGraph: NavHostController,
     homeScreenViewModel: HomeScreenViewModel
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screens.App.route
+        startDestination = Screen.HomeGraph.route,
+        modifier = Modifier.padding(innerPadding)
     ) {
-        composable(route = Screens.App.route) {
-            HomeScreenNav(
-                context = context,
-                padding = innerPadding,
-                navController = secondNavGraph,
-                nuageViewModel = homeScreenViewModel
-            )
+        navigation(
+            startDestination = Screen.Dashboard.route,
+            route = Screen.HomeGraph.route
+        ) {
+            composable(route = Screen.Dashboard.route) {
+                HomeScreen(
+                    context = context,
+                    nuageUiState = homeScreenViewModel.nuageUiState,
+                    viewModel = homeScreenViewModel,
+                    modifier = Modifier,
+                    onDayClicked = { dateString ->
+                        homeScreenViewModel.executeDailyScreenMapping(dateString)
+                        navController.navigate(Screen.DailyDetail.route)
+                    },
+                )
+            }
+            composable(route = Screen.DailyDetail.route) {
+                DayScreen(
+                    viewModel = homeScreenViewModel,
+                    modifier = Modifier
+                )
+            }
         }
-        composable(Screens.About.route) {
-            AboutScreen(modifier = Modifier.padding(innerPadding))
-        }
-    }
-}
-
-@Composable
-fun HomeScreenNav(
-    context: Context,
-    navController: NavHostController,
-    nuageViewModel: HomeScreenViewModel,
-    padding: PaddingValues
-) {
-    NavHost(
-        navController = navController,
-        route = Screens.App.route,
-        startDestination = Screens.App.Home.route
-    ) {
-        composable(Screens.App.Home.route) {
-            HomeScreen(
-                context = context,
-                // The state is already part of the ViewModel, so you can simplify this
-                nuageUiState = nuageViewModel.nuageUiState,
-                modifier = Modifier.padding(padding),
-                navController = navController,
-                viewModel = nuageViewModel
-            )
-        }
-        composable(route = Screens.App.Daily.route) {
-            DayScreen(
-                viewModel = nuageViewModel,
-                modifier = Modifier.padding(padding)
-            )
+        composable(route = Screen.About.route) {
+            AboutScreen(modifier = Modifier)
         }
     }
 }
