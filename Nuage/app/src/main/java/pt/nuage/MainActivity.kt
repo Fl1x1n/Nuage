@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -89,10 +91,6 @@ class MainActivity : ComponentActivity() {
                     route = Screen.About.route
                 )
             )
-
-
-
-
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
                 val navController = rememberNavController()
@@ -184,6 +182,7 @@ fun DefaultAppBar(
     onSearchClicked: () -> Unit,
 ) {
     TopAppBar(
+
         title = {
             Text(text = topBarTitle)
         },
@@ -226,37 +225,26 @@ fun SearchAppBar(
     val isSearching by viewModel.isSearching.collectAsState()
     val searchData by viewModel.searchData.collectAsState()
 
-    // The SearchBar should be the top-level component.
-    // We pass parameters directly to it instead of using the `inputField` slot.
     SearchBar(
-        modifier = Modifier.fillMaxWidth(), // Ensures it takes the full width of the app bar
+        modifier = Modifier.fillMaxWidth(),
         query = searchText,
         onQueryChange = viewModel::onSearchTextChange,
         onSearch = { query ->
-            // Hides the keyboard when search is submitted
-            // You can keep or remove this line based on desired UX
             viewModel.getSearchResults(query)
         },
-        // 'active' is the correct parameter to control the expanded/collapsed state
         active = isSearching,
-        // onActiveChange is the callback for when the state should change
         onActiveChange = { isActive ->
-            // This lambda controls the state.
-            // When the user clicks the back button or outside the search bar, `isActive` becomes false.
             if (!isActive) {
-                onCloseClicked() // This correctly switches back to the DefaultAppBar
+                onCloseClicked()
             }
-            viewModel.onToggleSearch() // Syncs our ViewModel state with the SearchBar's state
+            viewModel.onToggleSearch()
         },
         placeholder = { Text("Search for a location") },
         trailingIcon = {
-            // This icon is now correctly placed as a direct parameter of SearchBar
             IconButton(onClick = {
-                // A common UX pattern: if there's text, clear it. If not, close the bar.
                 if (searchText.isNotEmpty()) {
                     viewModel.onSearchTextChange("")
                 } else {
-                    // Manually trigger the state change to close the bar
                     viewModel.onToggleSearch()
                     onCloseClicked()
                 }
@@ -268,8 +256,6 @@ fun SearchAppBar(
             }
         }
     ) {
-        // This is the content area for when the SearchBar is active (expanded).
-        // Your existing logic for displaying results is perfect here.
         if (searchData.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier
