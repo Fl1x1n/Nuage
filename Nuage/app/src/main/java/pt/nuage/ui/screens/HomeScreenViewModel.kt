@@ -3,13 +3,14 @@ package pt.nuage.ui.screens
 import android.content.Context
 import android.util.Log
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import pt.nuage.R
 import pt.nuage.network.DailyData
@@ -21,19 +22,14 @@ import pt.nuage.services.Settings.getLongitudeFlow
 import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.collections.List
-import kotlin.collections.indices
-import kotlin.collections.listOf
-import kotlin.collections.map
-import kotlin.collections.mutableListOf
-import kotlin.collections.mutableMapOf
-import kotlin.collections.set
+import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
 /* ui state to send data to the home screen */
 sealed interface NuageUiState {
     data class Success(
-        val currentTemperature: Double,
+        val currentTemperature: Int,
+        val currentMinTemperature: Int,
         val currentHumidity: Int,
         val currentWeatherCode: HomeScreenViewModel.WeatherCodeEnum,
         val dailyWeather: DailyData.Daily,
@@ -55,7 +51,8 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
     private lateinit var hourlyWeather: HourlyData.Hourly
     private lateinit var dailyWeather: DailyData.Daily
 
-    private var currentTemperature: Double = 0.0
+    private var currentTemperature: Int = 0
+    private var currentMinTemperature: Int = 0
     private var currentHumidity: Int = 1
     private var dailyWeatherCode: List<WeatherCodeEnum> = listOf(WeatherCodeEnum.CLEAR)
 
@@ -66,10 +63,10 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
 
     /* public vars used on the daily screen */
     lateinit var currentTime: String
-    var temperatureDaily by Delegates.notNull<Double>()
-    var minTemperatureDaily by Delegates.notNull<Double>()
+    var temperatureDaily by Delegates.notNull<Int>()
+    var minTemperatureDaily by Delegates.notNull<Int>()
     lateinit var dailyWeatherCodeTime: WeatherCodeEnum
-    lateinit var dailyHourlyTemperatureMax: List<Double>
+    lateinit var dailyHourlyTemperatureMax: List<Int>
     lateinit var dailyHourlyHumidity: List<Int>
     lateinit var dailyHourlyWeatherCode: List<WeatherCodeEnum>
 
@@ -80,17 +77,21 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
     }
     /* enum for the weather code */
     enum class WeatherCodeEnum(
-        val description: String,
+        @StringRes val description: Int,
         @DrawableRes val icon: Int,
         @DrawableRes val banner: Int
     ) {
-        CLEAR("Clear", R.drawable.weather_sunny, R.drawable.clear),
-        CLOUDY("Cloudy", R.drawable.weather_cloudy, R.drawable.cloudy),
-        RAINY("Rainy", R.drawable.weather_rainy, R.drawable.rainy),
-        SNOWY("Snowy", R.drawable.weather_snowy, R.drawable.snow),
-        STORMY("Stormy", R.drawable.weather_lightning, R.drawable.lightning),
-        FOGGY("Foggy", R.drawable.weather_fog, R.drawable.foggy),
-        `PARTY-CLOUDY`("Partly Cloudy", R.drawable.weather_partly_cloudy, R.drawable.partly_cloudy)
+        CLEAR(R.string.weathercode_clear, R.drawable.weather_sunny, R.drawable.clear),
+        CLOUDY(R.string.weathercode_cloudy, R.drawable.weather_cloudy, R.drawable.cloudy),
+        RAINY(R.string.weathercode_rainy, R.drawable.weather_rainy, R.drawable.rainy),
+        SNOWY(R.string.weathercode_snowy, R.drawable.weather_snowy, R.drawable.snow),
+        STORMY(R.string.weathercode_stormy, R.drawable.weather_lightning, R.drawable.lightning),
+        FOGGY(R.string.weathercode_foggy, R.drawable.weather_fog, R.drawable.foggy),
+        PARTLYCLOUDY(
+            R.string.weathercode_pcloudy,
+            R.drawable.weather_partly_cloudy,
+            R.drawable.partly_cloudy
+        )
     }
 
     init {
@@ -108,7 +109,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
         _searchText.value = text
     }
 
-    fun onToogleSearch() {
+    fun onToggleSearch() {
         _isSearching.value = !_isSearching.value
         if (!_isSearching.value) {
             onSearchTextChange("")
@@ -160,6 +161,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
                 hourlyWeather = hourlyWeatherResponse.hourly
                 dailyWeather = dailyWeatherResponse.daily
                 currentTemperature = getHourlyTemperature(currentDateHourTemplate)
+                currentMinTemperature = getHourlyMinTemperature(currentDateHourTemplate)
                 currentHumidity = getHourlyHumidity(currentDateHourTemplate)
                 val currentWeatherCode = getCurrentHourlyWeatherCode(currentDateHourTemplate)
                 latitude = dailyWeatherResponse.latitude
@@ -168,6 +170,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
                 nuageUiState.value =
                     NuageUiState.Success(
                         currentTemperature,
+                        currentMinTemperature,
                         currentHumidity,
                         currentWeatherCode,
                         dailyWeather,
@@ -186,13 +189,23 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
     }
 
     /* get the hourly temperature, humidity and the weather code from the api and returns the value for the current hour of the device */
-    private fun getHourlyTemperature(dateTemplate: String): Double {
+    private fun getHourlyTemperature(dateTemplate: String): Int {
         val indexOfMatch = getDateMap(dateTemplate)
         if (indexOfMatch != -1) {
-            return hourlyWeather.temperature_2m[indexOfMatch]
+            return hourlyWeather.temperature_2m[indexOfMatch].roundToInt()
         } else {
             Log.e("getHourlyTemperature", "Couldn't get the current temperature")
-            return 0.0
+            return 0
+        }
+    }
+
+    private fun getHourlyMinTemperature(dateTemplate: String): Int {
+        val indexOfMatch = getDateMap(dateTemplate)
+        if (indexOfMatch != -1) {
+            return hourlyWeather.apparent_temperature[indexOfMatch].roundToInt()
+        } else {
+            Log.e("getHourlyMinTemperature", "Couldn't get the current minimum temperature")
+            return 0
         }
     }
 
@@ -211,7 +224,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
         if (indexOfMatch != 1) {
             return when (hourlyWeather.weather_code[indexOfMatch]) {
                 0 -> WeatherCodeEnum.CLEAR
-                1, 2 -> WeatherCodeEnum.`PARTY-CLOUDY`
+                1, 2 -> WeatherCodeEnum.PARTLYCLOUDY
                 3 -> WeatherCodeEnum.CLOUDY
                 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82 -> WeatherCodeEnum.RAINY
                 45, 48 -> WeatherCodeEnum.FOGGY
@@ -231,7 +244,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
         for (code in dailyWeather.weather_code) {
             val mappedCode = when (code) {
                 0 -> WeatherCodeEnum.CLEAR
-                in listOf(1, 2) -> WeatherCodeEnum.`PARTY-CLOUDY`
+                in listOf(1, 2) -> WeatherCodeEnum.PARTLYCLOUDY
                 3 -> WeatherCodeEnum.CLOUDY
                 in listOf(
                     51,
@@ -274,6 +287,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
         dailyWeatherCodeTime = getDailyWeatherCodeTime(getDailyCurrentIndex(time))
         dailyHourlyTemperatureMax =
             hourlyWeather.temperature_2m.subList(currentTimeIndex, currentTimeIndex + 24)
+                .map { it.roundToInt() }
         dailyHourlyHumidity =
             hourlyWeather.relative_humidity_2m.subList(currentTimeIndex, currentTimeIndex + 24)
         dailyHourlyWeatherCode = getDailyHourlyWeatherCode(currentTimeIndex)
@@ -290,12 +304,12 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
     }
 
     /* gets the current temperature for the day based on the given index */
-    private fun getDailyTemperature(currentIndex: Int): Double {
-        return dailyWeather.temperature_2m_max[currentIndex]
+    private fun getDailyTemperature(currentIndex: Int): Int {
+        return dailyWeather.temperature_2m_max[currentIndex].roundToInt()
     }
 
-    private fun getDailyMinimumTemperature(currentIndex: Int): Double {
-        return dailyWeather.temperature_2m_min[currentIndex]
+    private fun getDailyMinimumTemperature(currentIndex: Int): Int {
+        return dailyWeather.temperature_2m_min[currentIndex].roundToInt()
     }
 
     private fun getDailyWeatherCodeTime(currentIndex: Int): WeatherCodeEnum {
@@ -304,7 +318,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
         for (code in dailyWeather.weather_code) {
             val mappedCode = when (code) {
                 0 -> WeatherCodeEnum.CLEAR
-                in listOf(1, 2) -> WeatherCodeEnum.`PARTY-CLOUDY`
+                in listOf(1, 2) -> WeatherCodeEnum.PARTLYCLOUDY
                 3 -> WeatherCodeEnum.CLOUDY
                 in listOf(
                     51,
@@ -359,7 +373,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
         for (code in hourlyWeather.weather_code.subList(index, index + 24)) {
             val mappedCode = when (code) {
                 0 -> WeatherCodeEnum.CLEAR
-                in listOf(1, 2) -> WeatherCodeEnum.`PARTY-CLOUDY`
+                in listOf(1, 2) -> WeatherCodeEnum.PARTLYCLOUDY
                 3 -> WeatherCodeEnum.CLOUDY
                 in listOf(
                     51,
@@ -390,10 +404,6 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
             mappedWeatherCodes.add(mappedCode)
         }
         return mappedWeatherCodes
-    }
-
-    private fun getGeocode(latitude: Double, longitude: Double) {
-
     }
 }
 

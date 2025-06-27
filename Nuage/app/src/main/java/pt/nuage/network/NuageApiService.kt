@@ -17,7 +17,7 @@ class NuageApiService {
         suspend fun getHourlyWeather(
             @Query("latitude") latitude: Double?,
             @Query("longitude") longitude: Double?,
-            @Query("hourly") hourly: String = "temperature_2m,relative_humidity_2m,weather_code"
+            @Query("hourly") hourly: String = "temperature_2m,apparent_temperature,relative_humidity_2m,weather_code"
         ): HourlyData
 
         @GET("forecast")

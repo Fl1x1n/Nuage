@@ -32,7 +32,6 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
@@ -80,13 +79,13 @@ class MainActivity : ComponentActivity() {
                 NavigationItem(
                     title = "Home",
                     selectedIcon = Icons.Filled.Home,
-                    unselectedicon = Icons.Outlined.Home,
+                    unselectedIcon = Icons.Outlined.Home,
                     route = Screen.Dashboard.route
                 ),
                 NavigationItem(
                     title = "About",
                     selectedIcon = Icons.Filled.Info,
-                    unselectedicon = Icons.Outlined.Info,
+                    unselectedIcon = Icons.Outlined.Info,
                     route = Screen.About.route
                 )
             )
@@ -247,7 +246,7 @@ fun SearchAppBar(
             if (!isActive) {
                 onCloseClicked() // This correctly switches back to the DefaultAppBar
             }
-            viewModel.onToogleSearch() // Syncs our ViewModel state with the SearchBar's state
+            viewModel.onToggleSearch() // Syncs our ViewModel state with the SearchBar's state
         },
         placeholder = { Text("Search for a location") },
         trailingIcon = {
@@ -258,7 +257,7 @@ fun SearchAppBar(
                     viewModel.onSearchTextChange("")
                 } else {
                     // Manually trigger the state change to close the bar
-                    viewModel.onToogleSearch()
+                    viewModel.onToggleSearch()
                     onCloseClicked()
                 }
             }) {
@@ -287,7 +286,7 @@ fun SearchAppBar(
                                 saveLocation(context, item.latitude, item.longitude)
                                 viewModel.refreshWeatherData()
                             }
-                            viewModel.onToogleSearch()
+                            viewModel.onToggleSearch()
                             onCloseClicked()
                         }
                     ) {

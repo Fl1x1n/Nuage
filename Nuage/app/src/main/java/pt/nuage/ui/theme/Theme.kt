@@ -8,8 +8,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.Color
 
 
 private val lightScheme = lightColorScheme(
@@ -76,18 +74,6 @@ private val darkScheme = darkColorScheme(
 
 )
 
-
-@Immutable
-data class ColorFamily(
-    val color: Color,
-    val onColor: Color,
-    val colorContainer: Color,
-    val onColorContainer: Color
-)
-
-val unspecified_scheme = ColorFamily(
-    Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
-)
 
 
 @Composable

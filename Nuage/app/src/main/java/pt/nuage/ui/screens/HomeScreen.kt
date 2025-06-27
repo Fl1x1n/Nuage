@@ -39,6 +39,7 @@ import pt.nuage.ui.screens.components.TemperatureHero
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen(
@@ -58,6 +59,7 @@ fun HomeScreen(
             context = context,
             viewModel = viewModel,
             onDayClicked = onDayClicked,
+            hourlyTempMin = (nuageUiState.value as NuageUiState.Success).currentMinTemperature,
             hourlyTemperature = (nuageUiState.value as NuageUiState.Success).currentTemperature,
             hourlyWeatherCode = (nuageUiState.value as NuageUiState.Success).currentWeatherCode,
             hourlyHumidity = (nuageUiState.value as NuageUiState.Success).currentHumidity,
@@ -79,7 +81,7 @@ fun LoadingScreen(message: String) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF474BAB)),
+                .background(Color(0x00000000)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -96,8 +98,9 @@ fun LoadingScreen(message: String) {
 fun HomeScreenApp(
     context: Context,
     modifier: Modifier,
-    hourlyTemperature: Double,
+    hourlyTemperature: Int,
     hourlyHumidity: Int,
+    hourlyTempMin: Int,
     dailyWeather: DailyData.Daily,
     hourlyWeatherCode: HomeScreenViewModel.WeatherCodeEnum,
     dailyWeatherCode: List<HomeScreenViewModel.WeatherCodeEnum>,
@@ -110,6 +113,7 @@ fun HomeScreenApp(
         TemperatureBanner(
             context,
             hourlyTemperature,
+            hourlyTempMin,
             hourlyHumidity,
             hourlyWeatherCode,
             latitude,
@@ -123,7 +127,8 @@ fun HomeScreenApp(
 @Composable
 fun TemperatureBanner(
     context: Context,
-    temperature: Double,
+    temperature: Int,
+    tempMin: Int,
     humidity: Int,
     weatherCode: HomeScreenViewModel.WeatherCodeEnum,
     latitude: Double,
@@ -140,9 +145,11 @@ fun TemperatureBanner(
             stringResource(R.string.homeScreenWelcomeGeocode, viewModel.localityName),
             weatherCode.icon,
             weatherCode.description,
-            temperature,
+            temperature = temperature,
+            secondField = tempMin.toString(),
+            R.drawable.thermometer,
             "$humidity %",
-            R.drawable.water
+            R.drawable.water,
         )
     }
 }
@@ -176,10 +183,16 @@ fun TemperatureList(
                         dailyWeather.time[index],
                         dateFormatter
                     ).dayOfMonth.toString(),
-                    maxTemp = dailyWeather.temperature_2m_max[index].toString(),
-                    minTemp = dailyWeather.temperature_2m_min[index].toString(),
+                    maxTemp = stringResource(
+                        R.string.dailyScreenMinTemperatureHero,
+                        dailyWeather.temperature_2m_max[index].roundToInt().toString()
+                    ),
+                    minTemp = stringResource(
+                        R.string.dailyScreenMinTemperatureHero,
+                        dailyWeather.temperature_2m_min[index].roundToInt().toString()
+                    ),
                     weatherCodeIcon = weatherCode[index].icon,
-                    weatherCodeDescription = weatherCode[index].description,
+                    weatherCodeDescription = stringResource(weatherCode[index].description),
                     onDayCardClicked = {
                         onDayClicked(dailyWeather.time[index])
                     }
@@ -264,6 +277,7 @@ fun DayCard(
 }
 
 /* get locality name trough geocoder (currently not working with non-GMS devices because google is a shit company and i hope they fall off as they are right now) */
+@Suppress("DEPRECATION")
 fun getGeocode(context: Context, latitude: Double, longitude: Double): String {
     val local = Locale("pt_PT", "Portugal")
     val maxResult = 1

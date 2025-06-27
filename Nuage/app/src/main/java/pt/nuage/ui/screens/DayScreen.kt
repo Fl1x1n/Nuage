@@ -1,8 +1,6 @@
 package pt.nuage.ui.screens
 
-import android.os.Build
 import androidx.annotation.DrawableRes
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,15 +37,14 @@ import pt.nuage.ui.screens.components.TemperatureHero
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DayScreen(
     viewModel: HomeScreenViewModel,
     modifier: Modifier
 ) {
     val currentTime by remember { mutableStateOf(viewModel.currentTime) }
-    val dailyTemperature by remember { mutableStateOf(viewModel.temperatureDaily) }
-    val dailyMinTemperature by remember { mutableStateOf(viewModel.minTemperatureDaily) }
+    val dailyTemperature by remember { mutableIntStateOf(viewModel.temperatureDaily) }
+    val dailyMinTemperature by remember { mutableIntStateOf(viewModel.minTemperatureDaily) }
     val dailyWeatherCode by remember { mutableStateOf(viewModel.dailyWeatherCodeTime) }
     val hourlyTemperatureMax by remember {
         mutableStateOf(viewModel.dailyHourlyTemperatureMax)
@@ -82,13 +80,11 @@ fun DayScreen(
 
 }
 
-
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TemperatureBanner(
     time: String,
-    temperature: Double,
-    minTemperature: Double,
+    temperature: Int,
+    minTemperature: Int,
     weatherCode: HomeScreenViewModel.WeatherCodeEnum,
     locality: String
 ) {
@@ -106,14 +102,14 @@ fun TemperatureBanner(
             description = weatherCode.description,
             temperature = temperature,
             secondField = stringResource(R.string.dailyScreenMinTemperatureHero, minTemperature),
-            secondFieldIcon = R.drawable.thermometer_minus
+            secondFieldIcon = R.drawable.thermometer
         )
     }
 }
 
 @Composable
 fun TemperatureList(
-    temperatureMax: List<Double>,
+    temperatureMax: List<Int>,
     humidity: List<Int>,
     weatherCode: List<HomeScreenViewModel.WeatherCodeEnum>
 ) {
@@ -132,10 +128,13 @@ fun TemperatureList(
                 Spacer(modifier = Modifier.height(12.dp))
                 DayCard(
                     "${index}:00",
-                    temperatureMax[index].toString(),
+                    stringResource(
+                        R.string.dailyScreenMinTemperatureHero,
+                        temperatureMax[index].toString()
+                    ),
                     "${humidity[index]} %",
                     weatherCode[index].icon,
-                    weatherCode[index].description
+                    stringResource(weatherCode[index].description)
                 )
             }
         }

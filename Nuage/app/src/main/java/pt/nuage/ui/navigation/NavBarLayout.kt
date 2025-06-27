@@ -37,7 +37,7 @@ fun NavBarHeader() {
 
         Box(
             Modifier
-                .background(Color(0xff474bab))
+                .background(Color(0x00000000))
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_launcher_foreground),
@@ -72,7 +72,7 @@ fun NavBarBody(
                     imageVector = if (currentRoute == navigationItem.route) {
                         navigationItem.selectedIcon
                     } else {
-                        navigationItem.unselectedicon
+                        navigationItem.unselectedIcon
                     },
                     contentDescription = navigationItem.title
                 )

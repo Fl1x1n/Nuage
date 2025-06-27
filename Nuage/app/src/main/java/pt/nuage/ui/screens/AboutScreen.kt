@@ -51,7 +51,7 @@ fun AboutContent(modifier: Modifier) {
                 ) {
                     Row(
                         modifier = Modifier
-                            .background(Color(0xFF474BAB))
+                            .background(Color(0x00000000))
                     ) {
                         Image(
                             painterResource(R.drawable.ic_launcher_foreground),
@@ -67,7 +67,6 @@ fun AboutContent(modifier: Modifier) {
                         stringResource(R.string.aboutProgrammerHeading),
                         style = MaterialTheme.typography.headlineSmall
                     )
-                    Text("Tiago Carmo")
                     Text("Vítor Veríssimo")
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(

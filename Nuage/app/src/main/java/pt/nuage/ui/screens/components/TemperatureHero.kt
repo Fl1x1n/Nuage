@@ -1,6 +1,7 @@
 package pt.nuage.ui.screens.components
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,10 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.ParagraphStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -30,10 +30,12 @@ import androidx.compose.ui.unit.sp
 fun TemperatureHero(
     heading: String,
     @DrawableRes icon: Int,
-    description: String,
-    temperature: Double,
+    @StringRes description: Int,
+    temperature: Int,
     secondField: String,
-    @DrawableRes secondFieldIcon: Int
+    @DrawableRes secondFieldIcon: Int,
+    thirdField: String = "N/A",
+    @DrawableRes thirdFieldIcon: Int = 0,
 ) {
     Column(
         modifier = Modifier
@@ -61,12 +63,12 @@ fun TemperatureHero(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(
                         painter = painterResource(icon),
-                        contentDescription = description + "icon",
+                        contentDescription = stringResource(description) + "icon",
                         modifier = Modifier.size(78.dp),
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
                     )
                     Text(
-                        text = description,
+                        text = stringResource(description),
                         fontSize = 16.sp,
                     )
                 }
@@ -87,10 +89,22 @@ fun TemperatureHero(
                 Row {
                     Icon(
                         painterResource(secondFieldIcon),
+                        "tempMin",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                    Text(
+                        secondField,
+                        fontSize = 18.sp,
+                    )
+                }
+
+                Row {
+                    Icon(
+                        painterResource(thirdFieldIcon),
                         secondField + "icon",
                         tint = MaterialTheme.colorScheme.onBackground
                     )
-                    Text(secondField)
+                    Text(thirdField)
                 }
             }
         }

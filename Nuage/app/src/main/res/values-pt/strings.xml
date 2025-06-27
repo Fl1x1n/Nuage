@@ -2,11 +2,22 @@
 <resources>
     <string name="homeScreenErrorStateMessage">Um erro ocorreu :(</string>
     <string name="aboutScreenName">Sobre</string>
-    <string name="aboutProgrammerHeading">Programadores</string>
+    <string name="aboutProgrammerHeading">Desenvolvedor</string>
     <string name="aboutAdvisorHeading">Tutores</string>
     <string name="aboutTechHeading">Tecnologias</string>
     <string name="nextDaysHeading">Próximos dias</string>
     <string name="screenAboutName">Sobre</string>
     <string name="appBarSearchButton">Pesquisa</string>
     <string name="appBarCloseButton">Fechar</string>
+    <string name="homeScreenLoadingStateMessage">A carregar a API, por favor aguarde :D</string>
+    <string name="homeScreenWelcomeGeocode">Hoje em %1$s</string>
+    <string name="dailyScreenWelcomeGeocode">%1$s em %2$s</string>
+    <string name="dayScreenProvisionHeading">Previsão - Horas</string>
+    <string name="weathercode_clear">Céu Limpo</string>
+    <string name="weathercode_cloudy">Céu Nublado</string>
+    <string name="weathercode_rainy">Chuva</string>
+    <string name="weathercode_snowy">Neve</string>
+    <string name="weathercode_stormy">Trovoada</string>
+    <string name="weathercode_foggy">Nevoeiro</string>
+    <string name="weathercode_pcloudy">Parcialmente Nublado</string>
 </resources>

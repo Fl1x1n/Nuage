@@ -1,7 +1,6 @@
 package pt.nuage.network
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 
 @Serializable
@@ -20,6 +19,7 @@ data class HourlyData(
     data class HourlyUnits(
         val time: String,
         val temperature_2m: String,
+        val apparent_temperature: String,
         val relative_humidity_2m: String,
         val weather_code: String
     )
@@ -28,6 +28,7 @@ data class HourlyData(
     data class Hourly(
         val time: List<String>,
         val temperature_2m: List<Double>,
+        val apparent_temperature: List<Double>,
         val relative_humidity_2m: List<Int>,
         val weather_code: List<Int>
     )

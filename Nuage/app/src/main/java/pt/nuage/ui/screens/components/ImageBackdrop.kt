@@ -1,6 +1,7 @@
 package pt.nuage.ui.screens.components
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,11 +19,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ImageBackdrop(@DrawableRes image: Int, description: String) {
+fun ImageBackdrop(@DrawableRes image: Int, @StringRes description: Int) {
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
     val gradient = Brush.verticalGradient(
         colors = listOf(Color(0x40000000), MaterialTheme.colorScheme.background),
@@ -32,7 +34,7 @@ fun ImageBackdrop(@DrawableRes image: Int, description: String) {
     Box {
         Image(
             painter = painterResource(image),
-            contentDescription = description,
+            contentDescription = stringResource(description),
             contentScale = ContentScale.FillWidth,
             modifier = Modifier
                 .onGloballyPositioned {
