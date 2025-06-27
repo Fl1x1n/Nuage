@@ -34,8 +34,8 @@ fun TemperatureHero(
     temperature: Int,
     secondField: String,
     @DrawableRes secondFieldIcon: Int,
-    thirdField: String = "N/A",
-    @DrawableRes thirdFieldIcon: Int = 0,
+    thirdField: String? = null,
+    @DrawableRes thirdFieldIcon: Int? = null,
 ) {
     Column(
         modifier = Modifier
@@ -97,16 +97,16 @@ fun TemperatureHero(
                         fontSize = 18.sp,
                     )
                 }
-
-                Row {
-                    Icon(
-                        painterResource(thirdFieldIcon),
-                        secondField + "icon",
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                    Text(thirdField)
-                }
+                if (thirdField != null && thirdFieldIcon != null)
+                    Row {
+                        Icon(
+                            painterResource(thirdFieldIcon),
+                            secondField + "icon",
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                        Text(thirdField)
+                    }
+            }
             }
         }
     }
-}

@@ -146,7 +146,7 @@ fun TemperatureBanner(
             weatherCode.icon,
             weatherCode.description,
             temperature = temperature,
-            secondField = tempMin.toString(),
+            secondField = stringResource(R.string.dailyScreenMinTemperatureHero, tempMin.toString()),
             R.drawable.thermometer,
             "$humidity %",
             R.drawable.water,

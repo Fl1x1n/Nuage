@@ -90,7 +90,7 @@ fun TemperatureBanner(
 ) {
     Box {
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        val dateFormat = DateTimeFormatter.ofPattern("dd/MM")
         ImageBackdrop(weatherCode.banner, weatherCode.description)
         TemperatureHero(
             heading = stringResource(
