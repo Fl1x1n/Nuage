@@ -279,6 +279,7 @@ fun DayCard(
 /* get locality name trough geocoder (currently not working with non-GMS devices because google is a shit company and i hope they fall off as they are right now) */
 @Suppress("DEPRECATION")
 fun getGeocode(context: Context, latitude: Double, longitude: Double): String {
+    try{
     val local = Locale("pt_PT", "Portugal")
     val maxResult = 1
     var localityName = "N/A"
@@ -287,4 +288,7 @@ fun getGeocode(context: Context, latitude: Double, longitude: Double): String {
     if (address != null)
         localityName = address[0].locality.toString()
     return localityName
+    } catch(e: Exception) {
+        return e.toString();
+    }
 }

@@ -28,7 +28,7 @@ class NuageApiService {
         ): DailyData
 
         @GET("search")
-        suspend fun getSearchResults(@Query("name") name: String): SearchData
+        suspend fun getSearchResults(@Query("name") name: String, @Query("countryCode") countryCode: String = "PT"): SearchData
     }
 
 

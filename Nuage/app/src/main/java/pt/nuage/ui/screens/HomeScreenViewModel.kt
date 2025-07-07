@@ -93,7 +93,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
             R.drawable.partly_cloudy
         )
     }
-
+    //inicialize getting the weather data
     init {
         getWeatherData()
     }
