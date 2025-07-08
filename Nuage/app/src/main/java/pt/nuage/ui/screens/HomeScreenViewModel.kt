@@ -18,6 +18,7 @@ import pt.nuage.network.HourlyData
 import pt.nuage.network.NuageApiService
 import pt.nuage.network.SearchData
 import pt.nuage.services.Settings.getLatitudeFlow
+import pt.nuage.services.Settings.getLocality
 import pt.nuage.services.Settings.getLongitudeFlow
 import java.io.IOException
 import java.time.LocalDateTime
@@ -35,7 +36,8 @@ sealed interface NuageUiState {
         val dailyWeather: DailyData.Daily,
         val dailyWeatherCode: List<HomeScreenViewModel.WeatherCodeEnum>,
         val latitude: Double,
-        val longitude: Double
+        val longitude: Double,
+        val locality: String
     ) : NuageUiState
 
     data object Loading : NuageUiState
@@ -59,7 +61,6 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
     /* location and geocode */
     var latitude: Double = 0.0
     var longitude: Double = 0.0
-    lateinit var localityName: String
 
     /* public vars used on the daily screen */
     lateinit var currentTime: String
@@ -69,7 +70,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
     lateinit var dailyHourlyTemperatureMax: List<Int>
     lateinit var dailyHourlyHumidity: List<Int>
     lateinit var dailyHourlyWeatherCode: List<WeatherCodeEnum>
-
+lateinit var locality: String
 
     fun refreshWeatherData() {
         nuageUiState.value = NuageUiState.Loading
@@ -156,6 +157,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
             try {
                 val currentLatitude = getLatitudeFlow(context).first() ?: 40.4028 // Default if null
                 val currentLongitude = getLongitudeFlow(context).first() ?: -7.5398 // Default if null
+
                 val hourlyWeatherResponse = NuageApiService.retrofitService.getHourlyWeather(currentLatitude, currentLongitude)
                 val dailyWeatherResponse = NuageApiService.retrofitService.getDailyWeather(currentLatitude, currentLongitude)
                 hourlyWeather = hourlyWeatherResponse.hourly
@@ -167,6 +169,7 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
                 latitude = dailyWeatherResponse.latitude
                 longitude = dailyWeatherResponse.longitude
                 dailyWeatherCode = getDailyWeatherCode()
+                locality = getLocality(context).first() ?: "Fundão"
                 nuageUiState.value =
                     NuageUiState.Success(
                         currentTemperature,
@@ -176,7 +179,8 @@ class HomeScreenViewModel(private val context: Context) : ViewModel() {
                         dailyWeather,
                         dailyWeatherCode,
                         latitude,
-                        longitude
+                        longitude,
+                        locality
                     )
             } catch (e: IOException) {
                 nuageUiState.value = NuageUiState.Error

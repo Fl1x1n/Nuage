@@ -35,7 +35,7 @@ fun TemperatureHero(
     secondField: String,
     @DrawableRes secondFieldIcon: Int,
     thirdField: String? = null,
-    @DrawableRes thirdFieldIcon: Int? = null,
+    @DrawableRes thirdFieldIcon: Int? = null
 ) {
     Column(
         modifier = Modifier

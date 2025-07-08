@@ -32,9 +32,9 @@ fun SetUpNavGraph(
         ) {
             composable(route = Screen.Dashboard.route) {
                 HomeScreen(
-                    context = context,
+
                     nuageUiState = homeScreenViewModel.nuageUiState,
-                    viewModel = homeScreenViewModel,
+
                     modifier = Modifier,
                     onDayClicked = { dateString ->
                         homeScreenViewModel.executeDailyScreenMapping(dateString)

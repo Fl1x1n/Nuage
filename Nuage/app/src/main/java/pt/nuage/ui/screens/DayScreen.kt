@@ -56,6 +56,9 @@ fun DayScreen(
     val hourlyWeatherCode by remember {
         mutableStateOf(viewModel.dailyHourlyWeatherCode)
     }
+    val locality by remember {
+        mutableStateOf(viewModel.locality)
+    }
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -69,7 +72,7 @@ fun DayScreen(
                 temperature = dailyTemperature,
                 minTemperature = dailyMinTemperature,
                 weatherCode = dailyWeatherCode,
-                viewModel.localityName
+                locality
             )
             TemperatureList(
                 temperatureMax = hourlyTemperatureMax,

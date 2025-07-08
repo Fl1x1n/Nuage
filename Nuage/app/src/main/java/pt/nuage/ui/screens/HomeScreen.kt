@@ -1,12 +1,8 @@
 package pt.nuage.ui.screens
 
-import android.content.Context
-import android.location.Address
-import android.location.Geocoder
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,14 +36,11 @@ import pt.nuage.ui.screens.components.ImageBackdrop
 import pt.nuage.ui.screens.components.TemperatureHero
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen(
-    context: Context,
     nuageUiState: MutableState<NuageUiState>,
-    viewModel: HomeScreenViewModel,
     modifier: Modifier,
     onDayClicked: (String) -> Unit
 ) {
@@ -58,8 +51,6 @@ fun HomeScreen(
 
         is NuageUiState.Success -> HomeScreenApp(
             modifier = modifier,
-            context = context,
-            viewModel = viewModel,
             onDayClicked = onDayClicked,
             hourlyTempMin = (nuageUiState.value as NuageUiState.Success).currentMinTemperature,
             hourlyTemperature = (nuageUiState.value as NuageUiState.Success).currentTemperature,
@@ -67,8 +58,7 @@ fun HomeScreen(
             hourlyHumidity = (nuageUiState.value as NuageUiState.Success).currentHumidity,
             dailyWeather = (nuageUiState.value as NuageUiState.Success).dailyWeather,
             dailyWeatherCode = (nuageUiState.value as NuageUiState.Success).dailyWeatherCode,
-            latitude = (nuageUiState.value as NuageUiState.Success).latitude,
-            longitude = (nuageUiState.value as NuageUiState.Success).longitude
+            locality = (nuageUiState.value as NuageUiState.Success).locality
         )
 
         is NuageUiState.Error -> LoadingScreen(
@@ -98,7 +88,6 @@ fun LoadingScreen(message: String) {
 
 @Composable
 fun HomeScreenApp(
-    context: Context,
     modifier: Modifier,
     hourlyTemperature: Int,
     hourlyHumidity: Int,
@@ -106,21 +95,16 @@ fun HomeScreenApp(
     dailyWeather: DailyData.Daily,
     hourlyWeatherCode: HomeScreenViewModel.WeatherCodeEnum,
     dailyWeatherCode: List<HomeScreenViewModel.WeatherCodeEnum>,
-    latitude: Double,
-    longitude: Double,
     onDayClicked: (String) -> Unit,
-    viewModel: HomeScreenViewModel
+    locality: String,
 ) {
     Column(modifier) {
         TemperatureBanner(
-            context,
             hourlyTemperature,
             hourlyTempMin,
             hourlyHumidity,
             hourlyWeatherCode,
-            latitude,
-            longitude,
-            viewModel
+            locality
         )
         TemperatureList(dailyWeather, dailyWeatherCode, onDayClicked = onDayClicked)
     }
@@ -128,23 +112,19 @@ fun HomeScreenApp(
 
 @Composable
 fun TemperatureBanner(
-    context: Context,
     temperature: Int,
     tempMin: Int,
     humidity: Int,
     weatherCode: HomeScreenViewModel.WeatherCodeEnum,
-    latitude: Double,
-    longitude: Double,
-    viewModel: HomeScreenViewModel
+    locality: String
 ) {
-    viewModel.localityName = getGeocode(context, latitude, longitude)
     Box {
         ImageBackdrop(
             weatherCode.banner,
             weatherCode.description
         )
         TemperatureHero(
-            stringResource(R.string.homeScreenWelcomeGeocode, viewModel.localityName),
+            stringResource(R.string.homeScreenWelcomeGeocode, locality),
             weatherCode.icon,
             weatherCode.description,
             temperature = temperature,
@@ -275,22 +255,5 @@ fun DayCard(
 
             }
         }
-    }
-}
-
-/* get locality name trough geocoder (currently not working with non-GMS devices because google is a shit company and i hope they fall off as they are right now) */
-@Suppress("DEPRECATION")
-fun getGeocode(context: Context, latitude: Double, longitude: Double): String {
-    try{
-    val local = Locale("pt_PT", "Portugal")
-    val maxResult = 1
-    var localityName = "N/A"
-    val geocoder = Geocoder(context, local)
-    val address: MutableList<Address>? = geocoder.getFromLocation(latitude, longitude, maxResult)
-    if (address != null)
-        localityName = address[0].locality.toString()
-    return localityName
-    } catch(e: Exception) {
-        return e.toString();
     }
 }
