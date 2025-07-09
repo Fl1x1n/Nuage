@@ -6,6 +6,11 @@
 
 Nuage is a weather app developed by me in collaboration with my friend ReduxFlakes. The app will serve as my course's final project, summarizing everything I've learned.
 
+![Figma](https://img.shields.io/badge/figma-%23F24E1E.svg?style=for-the-badge&logo=figma&logoColor=white)
+![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
+![Android Studio](https://img.shields.io/badge/android%20studio-346ac1?style=for-the-badge&logo=android%20studio&logoColor=white)
+![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
+
 ## Table of Contents
 
 - [1. Main Idea](#1-MainIdea)
